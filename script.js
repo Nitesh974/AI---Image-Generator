@@ -1,4 +1,4 @@
-// Handling the initial image loading at startup
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     const images = [
         'images/Img-1.jpeg', 'images/Img-2.jpeg', 'images/Img-3.jpeg', 'images/Img-4.jpeg',
@@ -37,19 +37,20 @@ document.addEventListener('DOMContentLoaded', function() {
     window.onresize = updatePlaceholder;
 });
 
-//API CALLING
-const token = "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";
+// === API CALLING ===
+const token = "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";  // Replace if expired
 const inputTxt = document.getElementById("prompt-input");
 const button = document.getElementById("generate-btn");
 const imageIds = ['img1', 'img2', 'img3', 'img4'];
 
+// Updated to use public, stable model
 async function query(promptText) {
     const data = {
         inputs: promptText
     };
 
     const response = await fetch(
-        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
+        "https://api-inference.huggingface.co/models/CompVis/stable-diffusion-v1-4",
         {
             method: "POST",
             headers: {
@@ -71,8 +72,9 @@ async function query(promptText) {
 
 button.addEventListener('click', async function (event) {
     event.preventDefault();
-    const userInput = inputTxt.value;
-    if (userInput.trim() === '') {
+    const userInput = inputTxt.value.trim();
+
+    if (!userInput) {
         alert('Please enter some text to generate images.');
         return;
     }
@@ -88,16 +90,16 @@ button.addEventListener('click', async function (event) {
             const imgElement = document.getElementById(imageIds[index]);
             const objectURL = URL.createObjectURL(response);
             imgElement.src = objectURL;
+
             const downloadBtn = imgElement.nextElementSibling;
             downloadBtn.href = objectURL;
-            const filename = `Generated_Img_${index + 1}.jpg`; 
+            const filename = `Generated_Img_${index + 1}.jpg`;
             downloadBtn.setAttribute('download', filename);
         });
     } catch (error) {
         console.error('Failed to fetch images:', error);
-        alert('Failed to generate images. Please try again later.');
-    }
-    finally {
+        alert('Image generation failed. Please check your token or try again later.');
+    } finally {
         loadingOverlays.forEach(overlay => overlay.style.display = 'none');
     }
 });
@@ -105,9 +107,9 @@ button.addEventListener('click', async function (event) {
 inputTxt.addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
         event.preventDefault();
-        button.classList.add('active-state');  
-        setTimeout(() => {  // Remove active state after a short delay
-        button.classList.remove('active-state');}, 150); 
-        button.click();         
+        button.classList.add('active-state');
+        setTimeout(() => button.classList.remove('active-state'), 150);
+        button.click();
     }
 });
+</script>
